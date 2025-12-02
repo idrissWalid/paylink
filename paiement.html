@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement Orange Money</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b00, #ff8c00);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #ff6b00;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-weight: bold;
+            font-size: 24px;
+            color: #ff6b00;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo span {
+            font-weight: bold;
+        }
+
+        .title {
+            color: white;
+            font-size: 24px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .ussd-code {
+            background: #f8f9fa;
+            border: 2px dashed #ff6b00;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ussd-code:hover {
+            background: #fff3e0;
+            transform: translateY(-2px);
+        }
+
+        .ussd-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .copy-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ff6b00;
+        }
+
+        .pay-button {
+            width: 100%;
+            background: linear-gradient(135deg, #ff6b00, #ff8c00);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.4);
+        }
+
+        .pay-button:active {
+            transform: translateY(0);
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <span>OM</span>
+            </div>
+            <div class="title">Orange Money</div>
+        </div>
+
+        <div class="content">
+            <!-- Code USSD -->
+            <div class="ussd-code" id="ussdCode">
+                <div class="ussd-text">*144*2*1*55713380*montant#</div>
+                <div class="copy-text">Cliquez pour copier</div>
+            </div>
+
+            <!-- Formulaire de paiement -->
+            <div class="form-group">
+                <label for="phone">Numéro de téléphone :</label>
+                <input type="tel" id="phone" placeholder="Ex: 55713380" maxlength="8" pattern="[0-9]{8}">
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Montant (FCFA) :</label>
+                <input type="number" id="amount" placeholder="Ex: 1000" min="100" step="50">
+            </div>
+
+            <button class="pay-button" id="payButton">
+                VÉRIFIER LE PAIEMENT
+            </button>
+
+            <!-- Messages -->
+            <div class="success-message" id="successMessage">
+                ✅ Paiement vérifié avec succès !
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                ❌ Erreur lors de la vérification
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <strong>Instructions :</strong>
+                <ol>
+                    <li>Composez le code USSD ci-dessus</li>
+                    <li>Suivez les instructions pour effectuer le paiement</li>
+                    <li>Entrez votre numéro et le montant payé</li>
+                    <li>Cliquez sur "Vérifier le paiement"</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="footer">
+            Service sécurisé Orange Money © 2024
+        </div>
+    </div>
+
+    <script>
+
+            function updateUssdCode() {
+        const amount = document.getElementById('amount').value;
+        const ussdTextElement = document.querySelector('.ussd-text');
+
+        if (!amount || amount < 100) {
+            ussdTextElement.textContent = "*144*2*1*55713380*montant#";
+        } else {
+            ussdTextElement.textContent = `*144*2*1*55713380*${amount}#`;
+        }
+    }
+
+    // Mettre à jour le code en temps réel
+    document.getElementById('amount').addEventListener('input', updateUssdCode);
+
+    // Copier le code USSD dynamique
+    document.getElementById('ussdCode').addEventListener('click', function() {
+        const amount = document.getElementById('amount').value;
+
+        if (!amount || amount < 100) {
+            alert("Veuillez saisir un montant valide (≥ 100 FCFA)");
+            return;
+        }
+
+        const ussdText = `*144*2*1*55713380*${amount}#`;
+
+        navigator.clipboard.writeText(ussdText).then(() => {
+            const copyText = this.querySelector('.copy-text');
+            copyText.textContent = '✓ Code copié !';
+            copyText.style.color = '#4caf50';
+
+            setTimeout(() => {
+                copyText.textContent = 'Cliquez pour copier';
+                copyText.style.color = '#666';
+            }, 2000);
+        });
+    });
+    
+        // Copier le code USSD
+    document.getElementById('ussdCode').addEventListener('click', function() {
+        const amount = document.getElementById('amount').value;
+
+        if (!amount || amount < 100) {
+            alert("Veuillez d'abord saisir un montant valide (≥ 100 FCFA)");
+            return;
+        }
+
+        // Code USSD dynamique
+        const ussdText = `*144*2*1*55713380*${amount}#`;
+
+        navigator.clipboard.writeText(ussdText).then(() => {
+            const copyText = this.querySelector('.copy-text');
+            copyText.textContent = '✓ Code copié !';
+            copyText.style.color = '#4caf50';
+
+            // Mettre à jour l'affichage du code USSD visible
+            this.querySelector('.ussd-text').textContent = ussdText;
+
+            setTimeout(() => {
+                copyText.textContent = 'Cliquez pour copier';
+                copyText.style.color = '#666';
+            }, 2000);
+        });
+    });
+
+        // Vérifier le paiement
+        document.getElementById('payButton').addEventListener('click', function() {
+            const phone = document.getElementById('phone').value;
+            const amount = document.getElementById('amount').value;
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Masquer les messages précédents
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Validation
+            if (!phone || !amount) {
+                showError('Veuillez remplir tous les champs');
+                return;
+            }
+
+            if (phone.length !== 8) {
+                showError('Le numéro doit contenir 8 chiffres');
+                return;
+            }
+
+            if (amount < 100) {
+                showError('Le montant minimum est de 100 FCFA');
+                return;
+            }
+
+            // Appel à l'API
+            verifyPayment(phone, amount);
+        });
+
+        function verifyPayment(phone, amount) {
+            const apiUrl = '/api/verifier_paiement';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    numero: phone,
+                    montant: parseFloat(amount)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.statut === 'utilise') {
+                    showSuccess('Paiement vérifié et accepté !');
+                } else if (data.statut === 'deja_utilise') {
+                    showError('Ce paiement a déjà été utilisé');
+                } else {
+                    showError('Aucun paiement trouvé. Vérifiez le numéro et le montant');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showError('Erreur de connexion. Vérifiez le serveur.');
+            });
+        }
+
+        function showSuccess(message) {
+            const successElement = document.getElementById('successMessage');
+            successElement.textContent = '✅ ' + message;
+            successElement.style.display = 'block';
+            
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = '❌ ' + message;
+            errorElement.style.display = 'block';
+            
+            const successElement = document.getElementById('successMessage');
+            successElement.style.display = 'none';
+        }
+
+        // Validation en temps réel
+        document.getElementById('phone').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        document.getElementById('amount').addEventListener('input', function(e) {
+            if (this.value < 100) {
+                this.setCustomValidity('Le montant minimum est 100 FCFA');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>
